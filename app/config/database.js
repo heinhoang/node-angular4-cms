@@ -1,21 +1,23 @@
-const mongoose = require('mongoose');
 const Promise = require('bluebird');
 const chalk = require('chalk');
+const mongoose = Promise.promisifyAll(require('mongoose'));
 
 const Database = {};
+
+mongoose.Promise = Promise;
 
 /**
  * Init mongoose database
  */
 Database.init = () => {
-    mongoose.Promise = Promise;
+    // mongoose.Promise = Promise;
 
     const mongooseOpts = {
         username: 'demouser',
         password: '123',
         host: 'localhost',
         port: 27017,
-        dbName: 'nodejs-start-app',
+        dbName: 'nodejs-cms',
     };
     const dbUrl = `mongodb://${mongooseOpts.username}:${mongooseOpts.password}@${mongooseOpts.host}:${mongooseOpts.port}/${mongooseOpts.dbName}`;
 

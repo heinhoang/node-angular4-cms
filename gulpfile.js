@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
 const browserSync = require('browser-sync').create();
 const sass = require('gulp-sass');
+const env = require('gulp-env');
 
 const serverWatchFiles = [
     'server.js',
@@ -33,6 +34,12 @@ gulp.task('browser-sync', () => {
 });
 
 gulp.task('nodemon', (cb) => {
+    env({
+        vars: {
+            ENV: 'development',
+        },
+    });
+
     let called = false;
     return nodemon({
         // nodemon our expressjs server
@@ -46,17 +53,17 @@ gulp.task('nodemon', (cb) => {
         // watch core server file(s) that require server restart on change
         watch: serverWatchFiles,
     })
-    .on('start', () => {
-        // ensure start only got called once
-        if (!called) {
-            cb();
-            called = true;
-            gulp.start('browser-sync');
-        }
-    })
-    .on('restart', () => {
-        browserSync.reload();
-    });
+        .on('start', () => {
+            // ensure start only got called once
+            if (!called) {
+                cb();
+                called = true;
+                gulp.start('browser-sync');
+            }
+        })
+        .on('restart', () => {
+            browserSync.reload();
+        });
 });
 
 gulp.task('default', ['sass:watch', 'nodemon'], () => {

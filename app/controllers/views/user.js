@@ -2,18 +2,7 @@ const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
-const User = require('../models/User');
-
-/**
- * Login required middleware
- */
-exports.ensureAuthenticated = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        res.redirect('/login');
-    }
-};
+const User = require('../../models/User');
 
 /**
  * GET /login

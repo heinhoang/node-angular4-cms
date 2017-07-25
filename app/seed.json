@@ -1,0 +1,5 @@
+{
+	"undefined": "localhost/nodejs-cms",
+	"dev": "localhost/nodejs-cms",
+	"prod": "localhost/nodejs-cms-prop"
+}

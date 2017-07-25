@@ -11,6 +11,9 @@ const Locale = require('./config/locale');
 const Views = require('./config/views');
 // Router
 const AppRouter = require('./router');
+const SeedRoutes = require('./seeds/routes');
+// Middlewares
+const { Authentication } = require('./services');
 
 const App = {};
 
@@ -37,8 +40,20 @@ App.init = (app) => {
     // const hbs = exphbs.create({
     Views.init(app);
 
+    // get all services
+    const Services = { Authentication };
+
+    // authorization setup
+    // mongoose.connection.on('connected', () => {
+    //     Services.Authorization = Authorization.init(mongoose.connection.db);
+    // });
+
     // routing setup
-    app.use(AppRouter.init());
+    app.use(AppRouter.init(Services));
+    if (app.get('env') === 'development') {
+        app.use(SeedRoutes);
+    }
+
 
     // Production error handler
     if (app.get('env') === 'production') {
