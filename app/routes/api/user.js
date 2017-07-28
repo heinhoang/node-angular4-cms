@@ -1,15 +1,13 @@
-const validate = require('express-validation');
-
 const { ApiUserCtr } = require('../../controllers');
-const { validUser } = require('../../services/security');
+const { jwtAuthenticate } = require('../../services/auth/authentication');
 
 module.exports = version => [
     {
         prefix: `/api/${version}`,
-        route: '/users/signup',
-        method: 'POST',
-        controller: ApiUserCtr.createUser,
-        middlewares: [validate(validUser.create)],
+        route: '/users',
+        method: 'GET',
+        middlewares: [jwtAuthenticate],
+        controller: ApiUserCtr.getList,
         tags: 'api',
     },
 ];

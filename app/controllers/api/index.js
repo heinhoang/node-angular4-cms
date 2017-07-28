@@ -1,1 +1,0 @@
-exports.UserApi = require('./user');

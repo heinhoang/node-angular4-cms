@@ -1,3 +1,4 @@
+exports.ApiAuthCtr = require('./api/auth');
 exports.ApiUserCtr = require('./api/user');
 
 exports.HomeCtr = require('./views/home');

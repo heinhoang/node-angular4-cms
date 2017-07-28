@@ -3,16 +3,12 @@ const passport = require('passport');
 /**
  * Local Authentication Middleware
  */
-exports.localAuthenticate = () => {
-    passport.authenticate('local');
-};
+exports.localAuthenticate = () => passport.authenticate('local', { session: false });
 
 /**
  * Jwt Authentication Middleware
  */
-exports.jwtAuthenticate = () => {
-    passport.authenticate('jwt');
-};
+exports.jwtAuthenticate = () => passport.authenticate('jwt', { session: false });
 
 /**
  * Login required middleware

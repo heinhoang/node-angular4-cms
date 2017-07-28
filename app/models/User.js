@@ -41,6 +41,14 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         default: 'guest',
     },
+    active: {
+        type: Boolean,
+        default: true,
+    },
+    addedOn: {
+        type: Date,
+        default: Date.now,
+    },
     gender: String,
     location: String,
     website: String,
@@ -50,11 +58,11 @@ const UserSchema = new mongoose.Schema({
     google: String,
     github: String,
 }, {
-    timestamps: true,
-    toJSON: {
-        virtuals: true,
-    },
-});
+        timestamps: true,
+        toJSON: {
+            virtuals: true,
+        },
+    });
 
 // Add schema plugin
 UserSchema.plugin(uniqueValidator, {

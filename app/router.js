@@ -17,7 +17,7 @@ exports.init = () => {
 
         if (route && typeof controller === 'function') {
             if (middlewares !== null && Array.isArray(middlewares)) {
-                Router[method](route, ...middlewares, controller);
+                Router[method](route, middlewares, controller);
             } else {
                 Router[method](route, controller);
             }
