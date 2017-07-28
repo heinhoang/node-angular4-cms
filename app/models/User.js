@@ -1,29 +1,45 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+const { createToken } = require('../utils/security-helpers.js');
 
-const schemaOptions = {
-    timestamps: true,
-    toJSON: {
-        virtuals: true,
+const UserSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        trim: true,
     },
-};
-
-const userSchema = new mongoose.Schema({
-    name: String,
     email: {
         type: String,
         unique: true,
-        required: true,
+        required: [true, 'email is required'],
         trim: true,
+        validate: {
+            validator(email) {
+                // https://www.sitepoint.com/javascript-validate-email-address-regex/
+                const emailRegex = /^[-a-z0-9%S_+]+(\.[-a-z0-9%S_+]+)*@(?:[a-z0-9-]{1,63}\.){1,125}[a-z]{2,63}$/i;
+                return emailRegex.test(email);
+            },
+            message: '{VALUE} is not a valid email',
+        },
     },
-    password: String,
+    password: {
+        type: String,
+        required: [true, 'password is required'],
+        trim: true,
+        minlength: [8, 'password need to be longer'],
+        validate: {
+            validator(pwd) {
+                return pwd.length >= 8;
+            },
+        },
+    },
     passwordResetToken: String,
     passwordResetExpires: Date,
     userRole: {
         type: String,
         trim: true,
-        required: true,
+        default: 'guest',
     },
     gender: String,
     location: String,
@@ -33,27 +49,50 @@ const userSchema = new mongoose.Schema({
     twitter: String,
     google: String,
     github: String,
-    vk: String,
-}, schemaOptions);
-
-userSchema.pre('save', function (next) {
-    const user = this;
-    if (!user.isModified('password')) { return next(); }
-    bcrypt.genSalt(10, function (err, salt) {
-        bcrypt.hash(user.password, salt, null, function (err, hash) {
-            user.password = hash;
-            next();
-        });
-    });
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true,
+    },
 });
 
-userSchema.methods.comparePassword = function (password, cb) {
-    bcrypt.compare(password, this.password, function (err, isMatch) {
-        cb(err, isMatch);
-    });
+// Add schema plugin
+UserSchema.plugin(uniqueValidator, {
+    message: '{VALUE} was already taken',
+});
+
+// Before save
+UserSchema.pre('save', function hashPassword(next) {
+    const user = this;
+    if (user.isModified('password')) {
+        return bcrypt.genSalt(10, (err, salt) => {
+            if (err) return next(err);
+            return bcrypt.hash(user.password, salt, null, (err2, hash) => {
+                if (err2) return next(err2);
+                user.password = hash;
+                return next();
+            });
+        });
+    }
+    return next();
+});
+
+// Schema methods
+UserSchema.methods = {
+    /**
+     * compare password before saving
+     * @param {password} password to compare
+     * @param {cb} callback(err, isMatch)
+     */
+    comparePassword(password, cb) {
+        bcrypt.compare(password, this.password, (err, isMatch) => {
+            cb(err, isMatch);
+        });
+    },
 };
 
-userSchema.virtual('gravatar').get(function () {
+// Schema virtual properties
+UserSchema.virtual('gravatar').get(function getGravatar() {
     if (!this.get('email')) {
         return 'https://gravatar.com/avatar/?s=200&d=retro';
     }
@@ -61,15 +100,24 @@ userSchema.virtual('gravatar').get(function () {
     return `https://gravatar.com/avatar/${md5}?s=200&d=retro`;
 });
 
-userSchema.options.toJSON = {
-    transform: function (doc, _ret, options) {
+// Schema Options
+UserSchema.options.toJSON = {
+    transform(doc, _ret) {
         const ret = _ret;
+        const { _id } = ret;
+        ret.token = `JWT ${createToken(_id)}`;
         delete ret.password;
         delete ret.passwordResetToken;
         delete ret.passwordResetExpires;
     },
 };
 
-const User = mongoose.model('User', userSchema);
+// for this issue: https://stackoverflow.com/a/38143030/3765825
+let User;
+try {
+    User = mongoose.model('User');
+} catch (e) {
+    User = mongoose.model('User', UserSchema);
+}
 
 module.exports = User;

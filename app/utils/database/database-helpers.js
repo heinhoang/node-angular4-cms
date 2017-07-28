@@ -10,8 +10,8 @@ exports.crudCreate = (Model, successMsg) => new Promise((resolve, reject) => (
 /**
  * Helper to get database collection
  */
-exports.crudGetAll = (Model, queryOpts, fields, sortedFields) =>
-    Model.find(queryOpts).select(fields).sort(sortedFields).execAsync();
+exports.crudGetAll = (Model, queries, fields, sorted) =>
+    Model.find(queries).select(fields).sort(sorted).execAsync();
 
 
 /**

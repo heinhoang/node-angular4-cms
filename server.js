@@ -9,7 +9,7 @@ const MainApp = require('./app');
  * @param {app} your main express app
  * @param {adminApp} your admin app
  */
-exports.init = (server, app, port) => {
+exports.initApp = (app, port) => {
     // Config app before init
     app.set('rootDir', __dirname);
     app.set('port', port);
@@ -17,22 +17,18 @@ exports.init = (server, app, port) => {
 
     // Start main app
     MainApp.init(app);
+};
 
-    // make sure we don't run a second instance
+exports.initServer = (server, port) => {
     server.listen(port, () => {
-        console.log(chalk.green('✓ App is starting at %s'), `http://${server.address().address}:${server.address().port}`);
+        console.log(chalk.green('✓ Server is starting at %s'), `http://${server.address().address}:${server.address().port}`);
     });
-
-    // Watch for file change
-    // if (app.get('env') !== 'production') {
-    //     Watcher.init(app);
-    // }
 };
 
 /**
  * stop server
  */
-exports.end = (server) => {
+exports.endServer = (server) => {
     process.on('SIGTERM', () => {
         server.close(() => {
             process.exit(0);

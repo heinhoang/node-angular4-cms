@@ -31,44 +31,72 @@ const sessionSetting = () => {
  * Settings for localStrategy (Sign in with Email and Password)
  */
 
+// const localStrategy = new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
+//     // prevent callback hell, more here: http://blog.vullum.io/javascript-flow-callback-hell-vs-async-vs-highland/
+//     waterfall([
+//         // find user
+//         (next) => {
+//             User.findOne({ email }, (error, user) => {
+//                 if (error) {
+//                     next(error, null);
+//                 }
+//                 next(false, user);
+//             });
+//         },
+//         // check password
+//         (error, user, next) => {
+//             let err = null;
+//             let result = null;
+
+//             if (error) {
+//                 err = error;
+//             }
+//             if (!user) {
+//                 result = done(null, false, {
+//                     msg: `The email address ${email} is not associated with any account. Double-check your email address and try again.`,
+//                 });
+//             }
+//             user.comparePassword(password, (wrong, isMatch) => {
+//                 if (wrong) {
+//                     next(wrong, null);
+//                 }
+//                 if (!isMatch) {
+//                     result = done(null, false, { msg: 'Invalid email or password' });
+//                 }
+//                 result = done(null, user);
+//             });
+//             next(err, result);
+//         },
+//     ],
+//         (err, result) => {
+//             if (err) {
+//                 return done(err, false, {
+//                     msg: `meet error: ${err}`,
+//                 });
+//             }
+//             return result;
+//         });
+// });
 const localStrategy = new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-    // prevent callback hell, more here: http://blog.vullum.io/javascript-flow-callback-hell-vs-async-vs-highland/
-    waterfall([
-        // find user
-        (next) => {
-            User.findOne({ email }, (err, user) => {
-                if (err) {
-                    next(err, null);
-                }
-                next(null, user);
+    User.findOne({ email }, (err, user) => {
+        if (err) {
+            return done(err, false, {
+                msg: 'meet error',
             });
-        },
-        // check password
-        (user, next) => {
-            let result;
-            if (!user) {
-                result = done(null, false, {
-                    msg: `The email address ${email} is not associated with any account. Double-check your email address and try again.`,
-                });
-            }
-            user.comparePassword(password, (err, isMatch) => {
-                if (err) {
-                    next(err, null);
-                }
-                if (!isMatch) {
-                    result = done(null, false, { msg: 'Invalid email or password' });
-                }
-                result = done(null, user);
+        }
+        if (!user) {
+            return done(null, false, {
+                msg: `The email address ${email} is not associated with any account. ` +
+                'Double-check your email address and try again.',
             });
-            next(null, result);
-        },
-    ],
-        (err, result) => {
-            if (err) {
-                return done(err, false);
+        }
+        user.comparePassword(password, (err, isMatch) => {
+            if (!isMatch) {
+                return done(null, false, { msg: 'Invalid email or password' });
             }
-            return result;
+            return done(null, user);
         });
+    });
 });
 
 /**

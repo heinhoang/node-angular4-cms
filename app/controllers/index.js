@@ -1,3 +1,5 @@
-exports.HomeCtr = require('../controllers/views/home');
-exports.ContactCtr = require('../controllers/views/contact');
-exports.UserCtr = require('../controllers/views/user');
+exports.ApiUserCtr = require('./api/user');
+
+exports.HomeCtr = require('./views/home');
+exports.ContactCtr = require('./views/contact');
+exports.UserCtr = require('./views/user');

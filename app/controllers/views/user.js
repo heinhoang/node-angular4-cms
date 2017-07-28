@@ -81,6 +81,10 @@ exports.signupPost = (req, res, next) => {
     }
 
     return User.findOne({ email: req.body.email }, (err, user) => {
+        if (err) {
+            req.flash('error', { msg: err });
+            return res.redirect('/signup');
+        }
         if (user) {
             req.flash('error', { msg: 'The email address you have entered is already associated with another account.' });
             return res.redirect('/signup');
@@ -90,9 +94,17 @@ exports.signupPost = (req, res, next) => {
             email: req.body.email,
             password: req.body.password,
         });
-        return newUser.save((err) => {
-            req.logIn(user, (err) => {
-                res.redirect('/');
+        return newUser.save((e) => {
+            if (e) {
+                req.flash('error', { msg: `Meet error on saving ${e}` });
+                return res.redirect('/signup');
+            }
+            return req.logIn(newUser, (subErr) => {
+                if (subErr) {
+                    req.flash('error', { msg: `Meet error on login ${subErr}` });
+                    return res.redirect('/signup');
+                }
+                return res.redirect('/');
             });
         });
     });
@@ -170,24 +182,24 @@ exports.unlink = (req, res) => {
     User.findById(req.user.id, (err, success) => {
         const user = success;
         switch (req.params.provider) {
-        case 'facebook':
-            user.facebook = undefined;
-            break;
-        case 'google':
-            user.google = undefined;
-            break;
-        case 'twitter':
-            user.twitter = undefined;
-            break;
-        case 'vk':
-            user.vk = undefined;
-            break;
-        case 'github':
-            user.github = undefined;
-            break;
-        default:
-            req.flash('error', { msg: 'Invalid OAuth Provider' });
-            return res.redirect('/account');
+            case 'facebook':
+                user.facebook = undefined;
+                break;
+            case 'google':
+                user.google = undefined;
+                break;
+            case 'twitter':
+                user.twitter = undefined;
+                break;
+            case 'vk':
+                user.vk = undefined;
+                break;
+            case 'github':
+                user.github = undefined;
+                break;
+            default:
+                req.flash('error', { msg: 'Invalid OAuth Provider' });
+                return res.redirect('/account');
         }
         return user.save((error) => {
             req.flash('success', { msg: 'Your account has been unlinked.' });

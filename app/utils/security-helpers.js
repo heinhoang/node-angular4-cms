@@ -1,4 +1,5 @@
 const sanitizeHtml = require('sanitize-html');
+const jwt = require('jsonwebtoken');
 
 /**
  * Helper to sanitize body data (form fields)
@@ -17,20 +18,14 @@ exports.sanitizeUserInput = (req, next) => {
 };
 
 /**
- * Helper to validate normal character
+ * Validator helper to validate a string contains normal characters only
  */
-exports.validateNormalString = (strings, req) => {
-    const options = {};
+exports.isNormalString = string => /[a-zA-Z0-9]/i.test(string);
 
-    for (let i = 0; i < strings.length; i += 1) {
-        options[strings[i]] = {
-            notEmpty: true,
-            matches: {
-                options: /[a-zA-Z0-9]/i,
-                errorMessage: `${strings[i]} must be not empty and does not have special characters`,
-            },
-        };
-    }
-
-    req.assert(options);
-};
+/**
+ * Generate a jwt token for authentication
+ *
+ * @public
+ * @returns {String} token - JWT token
+ */
+exports.createToken = _id => jwt.sign({ _id }, process.env.JWT_SECRET);

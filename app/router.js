@@ -1,14 +1,12 @@
 const Router = require('express').Router();
 
-const routes = require('./routes');
+const Routes = require('./routes');
 
 /**
  * Loop all routes and run HTTP method respectively
  * @return {Router} express router
  */
-exports.init = (Services) => {
-    const Routes = routes(Services);
-
+exports.init = () => {
     for (let i = 0; i < Routes.length; i += 1) {
         const method = Routes[i].method.toLocaleLowerCase() || 'get';
         const { controller, prefix, sufix } = Routes[i];

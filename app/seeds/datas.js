@@ -4,7 +4,7 @@ module.exports = [
         samples: [
             {
                 name: 'admin',
-                email: 'bachdaonhan@gamil.com',
+                email: 'bachdaonhan@gmail.com',
                 password: 'password1',
                 userRole: 'admin',
             },

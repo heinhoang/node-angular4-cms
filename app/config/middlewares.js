@@ -12,6 +12,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const monitor = require('express-status-monitor');
 
+const { isNormalString } = require('../utils/security-helpers');
+
 const Middlewares = {};
 
 /**

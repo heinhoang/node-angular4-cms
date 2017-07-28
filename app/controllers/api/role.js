@@ -45,10 +45,14 @@ exports.postRole = (req, res, next) => {
  */
 exports.getRoles = (req, res) => {
     // validate
-    validateNormalString(['rolename'], req);
+    req.checkQuery('getparam', 'Invalid getparam').isInt();
+    const errors = req.validationErrors();
+    if (errors) {
+        return res.status(400).send('There have been validation errors');
+    }
 
+    // Prepare to get result
     const queries = {};
-    queries.roleName = '';
     if (req.query.rolename) {
         queries.roleName = { $regex: new RegExp(`.*${req.query.rolename}`, 'i') };
     }
@@ -56,7 +60,25 @@ exports.getRoles = (req, res) => {
     const fields = '';
     const sortedFields = { addedOn: -1 };
 
-    crudGetAll(RoleModel, queries, fields, sortedFields)
-        .then(result => res.status(HTTPStatus.OK).json(JSON.stringify(result)))
-        .catch(err => res.json(JSON.stringify({ error: err })));
+    // get result
+    return crudGetAll(RoleModel, queries, fields, sortedFields)
+        .then(resolve => res.status(HTTPStatus.OK).json(JSON.stringify(resolve)))
+        .catch(reject => res.json(JSON.stringify({ error: reject })));
+    // req.getValidationResult()
+    //     .then((result) => {
+    //         if (!result.isEmpty()) {
+    //             return res.status(400).send(`There have been validation errors: ${util.inspect(result.array())}`);
+    //         }
+    //         const queries = {};
+    //         if (req.query.rolename) {
+    //             queries.roleName = { $regex: new RegExp(`.*${req.query.rolename}`, 'i') };
+    //         }
+    //         queries.deleted = false;
+    //         const fields = '';
+    //         const sortedFields = { addedOn: -1 };
+
+    //         return crudGetAll(RoleModel, queries, fields, sortedFields)
+    //             .then(resolve => res.status(HTTPStatus.OK).json(JSON.stringify(resolve)))
+    //             .catch(reject => res.json(JSON.stringify({ error: reject })));
+    //     });
 };
