@@ -29,7 +29,7 @@ function seed(data) {
     Model.remove((err) => {
         if (err) console.log('can\'t remove');
     });
-    Model.insertManyAsync(seeds);
+    Model.create(seeds);
 }
 
 /**

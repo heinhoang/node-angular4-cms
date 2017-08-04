@@ -32,3 +32,8 @@ You can add more seed (each seed is a collection) to `app/seed folder`
 ### Features
 - User authentication
 - Multilanguage support
+
+### Todos
+[x] Search function
+[x] default guest role (in E:\Dev\NodeJS\nodejs-starter-app\app\services\auth\authorization.js)
+[x] test nodemailer on sendgrid, normal

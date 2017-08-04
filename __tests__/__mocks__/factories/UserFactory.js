@@ -1,6 +1,6 @@
-import faker from 'faker';
+const faker = require('faker');
 
-import BaseFactory from './BaseFactory';
+const BaseFactory = require('./BaseFactory');
 
 class UserFactory extends BaseFactory {
     /**
@@ -13,9 +13,8 @@ class UserFactory extends BaseFactory {
     generate(attrs) {
         return {
             name: `${faker.name.firstName()} ${faker.name.lastName()}`,
-            email: faker.internet.email(),
+            email: faker.internet.email().toLowerCase(),
             password: 'password1',
-            role: 'admin',
             ...attrs,
         };
     }

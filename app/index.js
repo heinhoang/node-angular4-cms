@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 
 // Load environment variables from .env file
 dotenv.load();
@@ -43,7 +44,6 @@ App.init = (app) => {
     if (app.get('env') === 'development') {
         app.use(SeedRoutes);
     }
-
 
     // Production error handler
     if (app.get('env') === 'production') {

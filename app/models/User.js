@@ -2,12 +2,21 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+
 const { createToken } = require('../utils/security-helpers.js');
+const { cryptPassword } = require('../utils/security-helpers');
 
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
         trim: true,
+        validate: {
+            validator(name) {
+                const regex = /^[a-zA-Z0-9\s']+$/i;
+                return regex.test(name);
+            },
+            message: '{VALUE} is not a valid name',
+        },
     },
     email: {
         type: String,
@@ -17,8 +26,8 @@ const UserSchema = new mongoose.Schema({
         validate: {
             validator(email) {
                 // https://www.sitepoint.com/javascript-validate-email-address-regex/
-                const emailRegex = /^[-a-z0-9%S_+]+(\.[-a-z0-9%S_+]+)*@(?:[a-z0-9-]{1,63}\.){1,125}[a-z]{2,63}$/i;
-                return emailRegex.test(email);
+                const regex = /^[-a-z0-9%S_+]+(\.[-a-z0-9%S_+]+)*@(?:[a-z0-9-]{1,63}\.){1,125}[a-z]{2,63}$/i;
+                return regex.test(email);
             },
             message: '{VALUE} is not a valid email',
         },
@@ -28,11 +37,6 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'password is required'],
         trim: true,
         minlength: [8, 'password need to be longer'],
-        validate: {
-            validator(pwd) {
-                return pwd.length >= 8;
-            },
-        },
     },
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -48,6 +52,10 @@ const UserSchema = new mongoose.Schema({
     addedOn: {
         type: Date,
         default: Date.now,
+    },
+    deleted: {
+        type: Boolean,
+        default: false,
     },
     gender: String,
     location: String,
@@ -72,17 +80,13 @@ UserSchema.plugin(uniqueValidator, {
 // Before save
 UserSchema.pre('save', function hashPassword(next) {
     const user = this;
-    if (user.isModified('password')) {
-        return bcrypt.genSalt(10, (err, salt) => {
-            if (err) return next(err);
-            return bcrypt.hash(user.password, salt, null, (err2, hash) => {
-                if (err2) return next(err2);
-                user.password = hash;
-                return next();
-            });
-        });
-    }
-    return next();
+    if (!user.isModified('password')) { return next(); }
+    const password = user.password;
+    return cryptPassword(password, (err, hash) => {
+        if (err) return next(err);
+        user.password = hash;
+        return next();
+    });
 });
 
 // Schema methods
@@ -117,6 +121,7 @@ UserSchema.options.toJSON = {
         delete ret.password;
         delete ret.passwordResetToken;
         delete ret.passwordResetExpires;
+        return ret;
     },
 };
 

@@ -90,7 +90,10 @@ const localStrategy = new LocalStrategy({ usernameField: 'email' }, (email, pass
                 'Double-check your email address and try again.',
             });
         }
-        user.comparePassword(password, (err, isMatch) => {
+        return user.comparePassword(password, (error, isMatch) => {
+            if (error) {
+                return done(err, false, { msg: `meet error ${error}` });
+            }
             if (!isMatch) {
                 return done(null, false, { msg: 'Invalid email or password' });
             }
@@ -104,7 +107,7 @@ const localStrategy = new LocalStrategy({ usernameField: 'email' }, (email, pass
  */
 const jwtOpts = {
     // Telling Passport to check authorization headers for JWT
-    jwtFromRequest: ExtractJwt.fromAuthHeader('authorization'),
+    jwtFromRequest: ExtractJwt.fromAuthHeader('Authorization'),
     // Telling Passport where to find the secret
     secretOrKey: process.env.JWT_SECRET,
 };
@@ -112,10 +115,10 @@ const jwtOpts = {
 const jwtLogin = new JWTStrategy(jwtOpts, (payload, done) => {
     User.findOne({ id: payload.sub }, (err, user) => {
         if (err) {
-            return done(err, false);
+            return done(err, false, { msg: 'meet error', error: err });
         }
         if (!user) {
-            return done(null, false);
+            return done(null, false, { msg: 'there\'s no user associated with this token' });
         }
         return done(null, user);
     });

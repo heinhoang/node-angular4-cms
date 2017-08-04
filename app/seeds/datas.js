@@ -14,7 +14,7 @@ module.exports = [
             name: `${faker.name.firstName()} ${faker.name.lastName()}`,
             email: faker.internet.email(),
             password: 'password1',
-            userRole: 'admin',
+            userRole: 'editor',
         }),
     },
     {
@@ -38,6 +38,8 @@ module.exports = [
             },
             {
                 roleName: 'guest',
+                write: true,
+                create: true,
             },
         ],
     },

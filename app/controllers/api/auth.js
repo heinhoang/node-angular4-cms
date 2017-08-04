@@ -1,7 +1,8 @@
 const User = require('../../models/User');
 const HTTPStatus = require('http-status');
 
-const { sanitizeUserInput } = require('../../utils/security-helpers');
+const { facet } = require('./facet');
+const { create: createUser } = require('../../utils/database/database-helpers');
 
 /**
  * @api {post} api/{version}/users/signup Create a user
@@ -34,17 +35,12 @@ const { sanitizeUserInput } = require('../../utils/security-helpers');
  *    email: 'email is required'
  *  }
  */
-exports.register = (req, res, next) => {
-    const body = sanitizeUserInput(req, next);
-    User.createAsync(body)
-        .then(user => res.status(HTTPStatus.CREATED).json(user))
-        .catch((e) => {
-            const errMsg = {
-                status: HTTPStatus.BAD_REQUEST,
-                error: e,
-            };
-            return next(errMsg);
-        });
+exports.register = (req, res) => {
+    const info = {
+        successStatus: HTTPStatus.CREATED,
+        failureStatus: HTTPStatus.BAD_REQUEST,
+    };
+    return facet(createUser, [User, req.body], { req, res }, info);
 };
 
 /**
