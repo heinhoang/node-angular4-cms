@@ -27,6 +27,21 @@ exports.validUser = {
     },
 };
 
+exports.vProductConfig = {
+    payment: {
+        body: Joi.object().keys({
+            list: Joi.object().keys({
+                items: Joi.array().items({
+                    name: Joi.string().required(),
+                    amount: Joi.number().min(1).required(),
+                    price: Joi.number().greater(0).required(),
+                    discount: Joi.number().greater(0).less(1),
+                }),
+            }),
+        }),
+    },
+};
+
 // uri validation
 exports.validURI = (req, res, next) => {
     const valid = /[\w\-+~:/?#[\]@&'=]+$/i.test(req.originalUrl);

@@ -1,13 +1,11 @@
-const validate = require('express-validation');
-
-const { mailer } = require('../../services/mailer');
+const { Mailer } = require('../../services');
 
 module.exports = version => [
     {
         prefix: `/api/${version}`,
         route: '/emails',
         method: 'POST',
-        controller: mailer,
+        controller: Mailer.mailer,
         tags: 'api',
     },
 ];

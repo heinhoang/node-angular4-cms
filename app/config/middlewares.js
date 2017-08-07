@@ -35,7 +35,7 @@ Middlewares.init = (app) => {
 
     app.use(compression());
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.urlencoded({ extended: true }));
     app.use(expressValidator());
     // override with POST having ?_method=PUT
     app.use(methodOverride('_method'));

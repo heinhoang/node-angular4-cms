@@ -6,7 +6,7 @@ const { joiValidate } = require('../utils/security-helpers');
 const emailProviders = ['normal', 'mailgun', 'postmark', 'mandrill', 'sendgrid', 'amazon'];
 const Schema = mongoose.Schema;
 
-const MailProviderSchema = new Schema({
+const MailerSchema = new Schema({
     providerType: {
         type: String,
         required: true,
@@ -101,6 +101,28 @@ const MailProviderSchema = new Schema({
     updatedOn: {
         type: Date,
     },
+    deletedBy: {
+        type: String,
+        trim: true,
+    },
+    deletedOn: {
+        type: Date,
+    },
 });
 
-module.exports = mongoose.model('MailProvider', MailProviderSchema);
+// Only one default field set to true
+MailerSchema.pre('save', function defaultField(next) {
+    if (this.default === true) {
+        this.constructor.update({}, { $set: { default: false } }, { multi: true }).exec();
+    }
+    next();
+});
+
+let Mailer;
+try {
+    Mailer = mongoose.model('Mailer');
+} catch (e) {
+    Mailer = mongoose.model('Mailer', MailerSchema);
+}
+
+module.exports = Mailer;

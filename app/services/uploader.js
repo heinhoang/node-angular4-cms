@@ -7,7 +7,7 @@ const { uploaderHelper } = require('../utils/uploader-helpers');
  * @param {Boolean} ctrType default false, if true this service will be controller
  * or else it'll be a middleware
  */
-const uploader = (uploadType, uploadArgs, ctrType = false) => (req, res, next) => {
+exports.upload = (uploadType, uploadArgs, ctrType = false) => (req, res, next) => {
     const upload = uploadType === 'array' ?
         uploaderHelper()[uploadType](...uploadArgs) :
         uploaderHelper()[uploadType](uploadArgs);
@@ -19,5 +19,3 @@ const uploader = (uploadType, uploadArgs, ctrType = false) => (req, res, next) =
         return ctrType ? res.json(JSON.stringify({ message: 'Uploaded successfully' })) : next();
     });
 };
-
-module.exports = uploader;
