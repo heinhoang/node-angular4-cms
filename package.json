@@ -68,7 +68,10 @@
     "paypal-rest-sdk": "^1.7.1",
     "postmark": "^1.4.1",
     "qs": "^6.5.0",
+    "redis": "^2.8.0",
     "sanitize-html": "^1.14.1",
+    "socket.io": "^2.0.3",
+    "socket.io-redis": "^5.1.0",
     "winston": "^2.3.1"
   },
   "devDependencies": {

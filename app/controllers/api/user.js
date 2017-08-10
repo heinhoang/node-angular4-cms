@@ -3,7 +3,7 @@ const util = require('util');
 
 const User = require('../../models/User');
 const { facet } = require('./facet');
-const { getById, getWithPager } = require('../../utils/database/database-helpers');
+const { getById, getList: getDocList } = require('../../utils/database/database-helpers');
 
 
 /**
@@ -73,7 +73,7 @@ exports.getList = (req, res) => {
     pagerOpts.perPage = parseInt(pagerOpts.perPage, 10);
     pagerOpts.page = parseInt(pagerOpts.page, 10);
 
-    return facet(getWithPager,
+    return facet(getDocList,
         [User, { findOpts, selectOpts, sortOpts, pagerOpts }],
         { req, res });
 };

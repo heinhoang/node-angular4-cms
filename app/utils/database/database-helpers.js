@@ -27,29 +27,35 @@ exports.create = (Model, bodyOpts) => Model.createAsync(bodyOpts);
  * @param {object} Options contains { findOpts, selectOpts, sortOpts, pagerOpts }
  * @returns {object} result includes { pager: { total, curentPage }, data }
  */
-exports.getWithPager = (Model, {
+exports.getList = (Model, {
     findOpts,
     selectOpts,
     sortOpts,
     pagerOpts,
-}) => join(
+    limitOpts,
+} = {}) => {
+    const skipOpts = (pagerOpts.perPage && pagerOpts.page) ?
+        pagerOpts.perPage * (pagerOpts.page - 1) : 0;
+    const curentPage = pagerOpts.page || 1;
+    return join(
         Model
-            .find(findOpts)
-            .select(selectOpts)
-            .skip(pagerOpts.perPage * (pagerOpts.page - 1))
-            .limit(pagerOpts.perPage)
-            .sort(sortOpts)
+            .find(findOpts || {})
+            .select(selectOpts || {})
+            .skip(skipOpts)
+            .limit(limitOpts || pagerOpts.perPage || 0)
+            .sort(sortOpts || '')
             .execAsync(),
         Model.count(findOpts).execAsync())
         .spread((data, count) => ({
             pager: {
                 total: count,
-                curentPage: pagerOpts.page,
+                curentPage,
             },
             data,
         }));
+};
 
-exports.getById = (Model, { modelId, selectOpts }) => {
+exports.getById = (Model, { modelId, selectOpts = {} }) => {
     if (modelId === 'guest') {
         return new Promise(resolve => resolve(null));
     }

@@ -1,7 +1,6 @@
 // const morgan = require('morgan');
 const compression = require('compression');
 const methodOverride = require('method-override');
-const session = require('express-session');
 const csrf = require('csurf');
 const flash = require('express-flash');
 const bodyParser = require('body-parser');
@@ -13,6 +12,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const hpp = require('hpp');
 const monitor = require('express-status-monitor');
+
+const { init: initSession } = require('./session');
 
 const Middlewares = {};
 
@@ -39,7 +40,7 @@ Middlewares.init = (app) => {
     app.use(expressValidator());
     // override with POST having ?_method=PUT
     app.use(methodOverride('_method'));
-    app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true }));
+    app.use(initSession());
     // https://docs.spring.io/spring-security/site/docs/current/reference/html/csrf.html
     // app.use(csrf({ cookie: false }));
     app.use(flash());

@@ -5,6 +5,7 @@ const User = require('./user');
 const Mailer = require('./mailer');
 const Upload = require('./upload');
 const Payment = require('./payment');
+const Chat = require('./chat');
 
 module.exports = [
     ...Auth(API_VERSION),
@@ -13,4 +14,5 @@ module.exports = [
     ...Mailer(API_VERSION),
     ...Upload(API_VERSION),
     ...Payment(API_VERSION),
+    ...Chat(API_VERSION),
 ];
