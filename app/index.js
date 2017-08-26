@@ -27,7 +27,7 @@ App.init = (app) => {
     Passport.init();
 
     // database config
-    Database.init();
+    Database.init(app);
 
     // middlewares setup
     Middlewares.init(app);

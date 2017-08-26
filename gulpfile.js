@@ -23,6 +23,17 @@ gulp.task('sass:watch', () => {
     gulp.watch('./front/scss/**/*.scss', ['sass'], browserSync.reload);
 });
 
+gulp.task('log:watch', (cb) => {
+    gulp.watch('./dbConnection.log', () => {
+        let called = false;
+        if (!called) {
+            cb();
+            called = true;
+            gulp.start('browser-sync');
+        }
+    });
+});
+
 gulp.task('browser-sync', () => {
     browserSync.init(null, {
         proxy: 'http://localhost:3000',
@@ -40,7 +51,7 @@ gulp.task('nodemon', (cb) => {
         },
     });
 
-    let called = false;
+    // let called = false;
     return nodemon({
         // nodemon our expressjs server
         script: 'index.js',
@@ -53,19 +64,19 @@ gulp.task('nodemon', (cb) => {
         // watch core server file(s) that require server restart on change
         watch: serverWatchFiles,
     })
-        .on('start', () => {
-            // ensure start only got called once
-            if (!called) {
-                cb();
-                called = true;
-                gulp.start('browser-sync');
-            }
-        })
+        // .on('start', () => {
+        //     // ensure start only got called once
+        //     if (!called) {
+        //         cb();
+        //         called = true;
+        //         gulp.start('browser-sync');
+        //     }
+        // })
         .on('restart', () => {
             browserSync.reload();
         });
 });
 
-gulp.task('default', ['sass:watch', 'nodemon'], () => {
+gulp.task('default', ['sass:watch', 'nodemon', 'log:watch'], () => {
     // browserSync.reload();
 });

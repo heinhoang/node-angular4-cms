@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const chalk = require('chalk');
 const mongoose = Promise.promisifyAll(require('mongoose'));
+const fs = require('fs');
 
 const Database = {};
 
@@ -9,7 +10,7 @@ mongoose.Promise = Promise;
 /**
  * Init mongoose database
  */
-Database.init = () => {
+Database.init = (app) => {
     // mongoose.Promise = Promise;
 
     const mongooseOpts = {
@@ -33,6 +34,10 @@ Database.init = () => {
     mongoose.connection
         .once('open', () => {
             console.log(chalk.green('✓ MongoDB is running'));
+            // fs.createWriteStream(`${app.get('rootDir')}/dbConnection.log`, { flags: 'a' });
+            fs.writeFile(`${app.get('rootDir')}/dbConnection.log`, `database connected on ${new Date()}`, (err) => {
+                if (err) throw err;
+            });
         })
         .on('error', () => {
             console.log(chalk.red('MongoDB Connection Error. Please make sure that MongoDB is running & you have privileges to access.'));
