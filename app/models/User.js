@@ -6,7 +6,9 @@ const uniqueValidator = require('mongoose-unique-validator');
 const { createToken } = require('../utils/security-helpers.js');
 const { cryptPassword } = require('../utils/security-helpers');
 
-const UserSchema = new mongoose.Schema({
+const Schema = mongoose.Schema;
+
+const UserSchema = new Schema({
     name: {
         type: String,
         trim: true,
@@ -65,7 +67,10 @@ const UserSchema = new mongoose.Schema({
     twitter: String,
     google: String,
     github: String,
-}, {
+    favorites: [{ type: Schema.Types.ObjectId, ref: 'Article' }],
+    following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+},
+    {
         timestamps: true,
         toJSON: {
             virtuals: true,
@@ -101,7 +106,44 @@ UserSchema.methods = {
             cb(err, isMatch);
         });
     },
+    // toProfileJSON(user) {
+    //     const { _id } = this;
+    //     return {
+    //         username: this.username,
+    //         bio: this.bio,
+    //         image: this.image || 'https://static.productionready.io/images/smiley-cyrus.jpg',
+    //         following: user ? user.isFollowing(_id) : false,
+    //     };
+    // },
+    favorite(id) {
+        if (this.favorites.indexOf(id) === -1) {
+            this.favorites.push(id);
+        }
+
+        return this.save();
+    },
+    unfavorite(id) {
+        this.favorites.remove(id);
+        return this.save();
+    },
+    isFavorite(id) {
+        return this.favorites.some(favoriteId => favoriteId.toString() === id.toString());
+    },
+    follow(id) {
+        if (this.following.indexOf(id) === -1) {
+            this.following.push(id);
+        }
+        return this.save();
+    },
+    unfollow(id) {
+        this.following.remove(id);
+        return this.save();
+    },
+    isFollowing(id) {
+        return this.following.some(followId => followId.toString() === id.toString());
+    },
 };
+
 
 // Schema virtual properties
 UserSchema.virtual('gravatar').get(function getGravatar() {
